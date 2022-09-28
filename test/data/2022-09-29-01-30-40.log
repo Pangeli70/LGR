@@ -1,0 +1,30 @@
+{
+  "id": 1,
+  "session": "2022-09-29-01-30-40",
+  "name": "Test logger",
+  "creationTime": "2022-09-28T23:30:40.132Z",
+  "creationHrt": 6541.176,
+  "events": [
+    {
+      "depth": 0,
+      "className": "ApgLgrTester",
+      "method": "run",
+      "dateTimeStamp": "2022-09-29-01-30-40",
+      "hrt": 6541.4305
+    },
+    {
+      "depth": 0,
+      "className": "ApgLgrTester",
+      "method": "run",
+      "dateTimeStamp": "2022-09-29-01-30-40",
+      "hrt": 6541.6764,
+      "result": {
+        "error": 21,
+        "message": "Unmanaged test error"
+      }
+    }
+  ],
+  "depth": 0,
+  "hasErrors": true,
+  "totalHrt": 0.9716999999991458
+}

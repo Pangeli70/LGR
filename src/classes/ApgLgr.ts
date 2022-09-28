@@ -20,19 +20,19 @@ import { eApgLgrTransportTypes } from "../enums/eApgLgrTransportTypes.ts";
 
 export class ApgLgr {
 
-  /** The Id of the next Event logger to be inserted in the pool */
-  private static _nextId = 0;
 
-  /** A session name to group events Together */
+  /** A session name to group events together. 
+   * It is used to name the files and group the loggers in the mongo database*/
   private static _session = "";
 
-  /** number of times the logger was flushed */
+  /** The Id of the next Event logger in the current session*/
+  private static _nextId = 0;
+
+  /** Number of times the logger was flushed. 
+   * It is used by the file transport to add a comma separator */
   private static _flushCount = 0;
 
-  /** A pool for all the current active Event loggers */
-  private static readonly _pool: Map<number, ApgLgr> = new Map();
-
-  /** The transports for the log system */
+  /** The transports set to flush the logger */
   private static readonly _transports: Map<eApgLgrTransportTypes, IApgLgrTransport> = new Map();
 
 
@@ -177,7 +177,6 @@ export class ApgLgr {
     }
 
     ApgLgr._flushCount++;
-    ApgLgr._pool.delete(this.id);
 
     Rst.ApgRstAssert.IsFalse(
       this.depth === 0,
@@ -215,6 +214,10 @@ export class ApgLgr {
 
     await acollection.insertOne(aentry);
 
+  }
+
+  static ClearTrasports() { 
+    this._transports.clear();
   }
 
 }

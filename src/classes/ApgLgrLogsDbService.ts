@@ -58,32 +58,33 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
     this._sessions = await this.#readLogSessionsFromDb();
 
     this.sortSessionsDescending();
-    const r = new Promise<Rst.ApgRst>(_resolve => new Rst.ApgRst());
-    return r;
+
+    return new Rst.ApgRst();
 
   }
 
-
+  // Warning: unsorted
   async #readLogSessionsFromDb() {
 
     const r: string[] = [];
 
-    // Search for the loggers used during app bootstrap
-    // Those are the ones that identify the sessions starts
-    const query = { 'meta.name': this.META_NAME };
-    const loggers = await this._collection!.find(query).toArray();
+    const query = [
+      {
+        '$group': {
+          '_id': '$session'
+        }
+      }
+    ];
+    const loggers = await this._collection!
+      .aggregate<{ _id: string }>(query)
+      .toArray();
+
     loggers.map(item => {
-      const adate = (item).creationTime;
-      const dateTimeStamp = new Uts.ApgUtsDateTimeStamp(adate).Value;
-      r.push(dateTimeStamp);
+      r.push(item._id);
     });
 
     return r;
   }
-
-
-
-
 
 
   async loadLoggersFromSessionIndex(asessionIndex: number): Promise<IApgLgr[]> {
@@ -99,27 +100,22 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
 
   async #loadLoggersFromDb(asessionIndex: number) {
 
-    const creationTimeCriteria: any = {};
+    const session = this._sessions[asessionIndex];
 
-    // Greater than criteria
-    const dateTimeStampObj = new Uts.ApgUtsDateTimeStamp(this._sessions[asessionIndex]);
-    const startTime = dateTimeStampObj.Date;
-    creationTimeCriteria.$gte = startTime;
-
-    // Lesser than criteria
-    if (asessionIndex !== 0) {
-      const dateTimeStampObj = new Uts.ApgUtsDateTimeStamp(this._sessions[asessionIndex - 1]);
-      const endTime = dateTimeStampObj.Date;
-      creationTimeCriteria.$lt = endTime;
+    const query =
+    {
+      'session': session
     }
 
-    const mongoQuery: any = {};
-    // TODO check this. maybe meta is superfluous
-    mongoQuery['meta.creationTime'] = creationTimeCriteria
-
     const r = await this._collection!
-      .find(mongoQuery)
-      .toArray();
+      .find(query)
+      .toArray()
+
+    r.sort((a, b) => {
+      return (a.creationTime > b.creationTime) ?
+        1 : (a.creationTime < b.creationTime) ?
+          -1 : 0;
+    })
 
     return r;
   }
@@ -127,25 +123,24 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
 
   async purgeOldSessions(akeepTheLast: number) {
 
-
-      return await this.#purgeSessionsDocumentsFromDb(akeepTheLast);
-
+    const r = new Rst.ApgRst();
+    const n = await this.#purgeSessionsDocumentsFromDb(akeepTheLast);
+    const p: Rst.IApgRstPayload = {
+      signature: "number",
+      data: n
+    }
+    r.setPayload(p)
+    return r;
 
   }
 
-
-
   async #purgeSessionsDocumentsFromDb(akeepTheLast: number) {
 
+    const lastSession = this._sessions[akeepTheLast - 1];
 
-    let r = new Rst.ApgRst();
-
-    // TODO Figure out how to select the data to purge.
-    const criteria = {};
-    const dbr = await this._collection!.deleteMany(criteria);
-    if (dbr == 0) {
-      r = Rst.ApgRstErrors.Unmanaged("Errore sconosciuto cancellando sessioni dal database mongo");
-    }
+    const criteria = { "session": { "$lt": lastSession } };
+    const r = await this._collection!.deleteMany(criteria);
+    this._sessions.splice(akeepTheLast, r);
 
     return r;
   }
