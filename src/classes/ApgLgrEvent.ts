@@ -1,5 +1,5 @@
 /** -----------------------------------------------------------------------
- * @module [Logs]
+ * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.2.0 [APG 2018/06/02]
  * @version 0.5.1 [APG 2019/03/17]

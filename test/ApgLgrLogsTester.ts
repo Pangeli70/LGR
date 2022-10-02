@@ -1,7 +1,7 @@
 /** -----------------------------------------------------------------------
- * @module [Logs]
+ * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
- * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.2 [APG 2022/09/24] Github Beta
  * -----------------------------------------------------------------------
  */
 import {
@@ -32,6 +32,8 @@ const KEEP_THE_LAST_N_SESSIONS = 3;
 
 export class ApgLgrLogsTester extends ApgLgrLoggable {
 
+    private _mongoService: Mng.ApgMngService | null = null;
+
     constructor(alogger: ApgLgr) {
         super(import.meta.url, alogger)
     }
@@ -49,16 +51,16 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
         return r;
     }
 
-    async #getLogsDatabase(amode: eApgLgrLogsTesterMode) {
+    async #initializeMongoService(amode: eApgLgrLogsTesterMode) {
         const env = DotEnv.config()
 
-        let mongoService: Mng.ApgMngService;
+        let r: Mng.ApgMngService | null = null;
         if (amode == eApgLgrLogsTesterMode.localDb) {
-            mongoService = new Mng.ApgMngLocalService(DB_NAME)
+            r = new Mng.ApgMngLocalService(DB_NAME)
             console.log("Mongo DB Local connecting")
         }
         else if (amode == eApgLgrLogsTesterMode.atlasDb) {
-            mongoService = new Mng.ApgMngAtlasService(
+            r = new Mng.ApgMngAtlasService(
                 DB_NAME,
                 env.atlasShard,
                 env.user,
@@ -66,27 +68,38 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
             )
             console.log("Mongo DB Atlas connecting")
         }
+        if (r != null) {
+
+            await r.initializeConnection();
+
+            if (!r.Status.Ok) {
+                console.log(this.className + " Error: Mongo DB not connected");
+                return r;
+            } else {
+                console.log("Mongo DB connected")
+            }
+        }
+        else { 
+            console.log("Mongo DB connection FAILURE")
+        }
+        return r;
+    }
+
+    async #getLogsDatabase(amode: eApgLgrLogsTesterMode) {
+
+        this._mongoService = await this.#initializeMongoService(amode);
 
         let db: MongoDatabase | null = null;
         let logsCollection: MongoCollection<IApgLgr> | null = null;
 
-        await mongoService!.initializeConnection();
-        const mongoDBConnected = mongoService!.Status.Ok;
-        if (!mongoDBConnected) {
-            console.log(this.className + " Error: Mongo DB not connected");
-            return;
-        } else {
-            console.log("Mongo DB connected")
-        }
-
-        if (mongoDBConnected) {
-            db = mongoService!.Database;
+        if (this._mongoService!.Status.Ok) {
+            db = this._mongoService!.Database;
             logsCollection = db!.collection<IApgLgr>(COLLECTION);
         }
 
         if (logsCollection == undefined) {
             console.log(this.className + " Error: Logs collection not initialized");
-            return;
+            return null;
         }
         console.log("Logs collection connected")
 
@@ -134,6 +147,10 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
 
         const loggerWithErrors = await logsService!.getLoggerWithFilteredEvents(index, loggers[0].id, true);
         console.log(`The logger with id [${loggers[0].id}] contains: [${loggerWithErrors.events.length}] error events`);
+
+        if (this._mongoService != null) { 
+            this._mongoService!.closeConnection();
+        }
 
     }
 

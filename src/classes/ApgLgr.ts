@@ -1,16 +1,19 @@
 /** ----------------------------------------------------------------------
- * @module [Logs]
+ * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.2.0 [APG 2018/06/02]
  * @version 0.5.0 [APG 2018/11/24]
  * @version 0.7.1 [APG 2019/08/28] 
  * @version 0.8.0 [APG 2022/03/19] Porting to deno 
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
- * @version 0.9.1 [APG 2022/09/24] Splitting renamin etc 
+ * @version 0.9.1 [APG 2022/09/24] Splitting renaming etc 
+ * @version 0.9.2 [APG 2022/09/24] Github Beta 
  * -----------------------------------------------------------------------
  */
 
-import { MongoCollection, Rst, StdPath, Uts } from '../../deps.ts';
+import {
+  MongoCollection, StdPath, Uts, Rst
+} from '../../deps.ts';
 
 import { ApgLgrEvent } from './ApgLgrEvent.ts'
 import { IApgLgr } from '../interfaces/IApgLgr.ts'
@@ -20,9 +23,8 @@ import { eApgLgrTransportTypes } from "../enums/eApgLgrTransportTypes.ts";
 
 export class ApgLgr {
 
-
-  /** A session name to group events together. 
-   * It is used to name the files and group the loggers in the mongo database*/
+  /** A session name to group loggers together inside a common persistent repository. 
+   * It is used to name the files for file trasnport and group the loggers in the mongo database*/
   private static _session = "";
 
   /** The Id of the next Event logger in the current session*/
@@ -32,27 +34,34 @@ export class ApgLgr {
    * It is used by the file transport to add a comma separator */
   private static _flushCount = 0;
 
-  /** The transports set to flush the logger */
+  /** The transports used to flush the logger */
   private static readonly _transports: Map<eApgLgrTransportTypes, IApgLgrTransport> = new Map();
 
-
+  /** Current logger index in this logging session*/
   id = 0;
 
+  /** Current logging session reference */
   session: string;
 
+  /** Logger name to help identification*/
   name: string;
 
   /** This creation date is used to sort data in Mongo DB storage */
   creationTime: Date = new Date();
 
+  /** High resolution timer creation */
   creationHrt = performance.now();
 
+  /** Events traced between cration and flush */
   events: ApgLgrEvent[] = [];
 
+  /** Leve indicator of nested log calls */
   depth = 0;
 
+  /** At least one of the logged events is an error */
   hasErrors = false;
 
+  /** Total time in milliseconds between creation and flush*/
   totalHrt = 0;
 
   constructor(aname: string) {
@@ -111,7 +120,6 @@ export class ApgLgr {
     ApgLgr._transports.set(eApgLgrTransportTypes.console, consoleTransport);
   }
 
-
   /**
    * @param alogsDevPath Must exist and have file write permissions
    * @param afile 
@@ -141,7 +149,6 @@ export class ApgLgr {
     ApgLgr._transports.set(eApgLgrTransportTypes.file, fileTransport);
   }
 
-
   static AddMongoTransport(acollection: MongoCollection<IApgLgr>, alocal: boolean) {
 
     const transportType = (alocal) ? eApgLgrTransportTypes.mongoLocal : eApgLgrTransportTypes.mongoAtlas
@@ -154,7 +161,8 @@ export class ApgLgr {
   }
 
   /**
-   * Saves logs data to the initialized transports . Returns the total flush time
+   * Transfers accumulated data to the initialized transports. 
+   * Returns the total flush time.
    */
   async flush() {
 
@@ -168,12 +176,12 @@ export class ApgLgr {
 
     const mongoLocalTrasport = ApgLgr._transports.get(eApgLgrTransportTypes.mongoLocal);
     if (mongoLocalTrasport) {
-        await this.#flushMongo(mongoLocalTrasport.collection!, this);
+      await this.#flushMongo(mongoLocalTrasport.collection!, this);
     }
 
     const mongoAtlasTrasport = ApgLgr._transports.get(eApgLgrTransportTypes.mongoAtlas);
     if (mongoAtlasTrasport) {
-        await this.#flushMongo(mongoAtlasTrasport.collection!, this);
+      await this.#flushMongo(mongoAtlasTrasport.collection!, this);
     }
 
     ApgLgr._flushCount++;
@@ -216,8 +224,10 @@ export class ApgLgr {
 
   }
 
-  static ClearTrasports() { 
+  static ClearTrasports() {
+
     this._transports.clear();
+
   }
 
 }

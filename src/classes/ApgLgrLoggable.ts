@@ -8,6 +8,7 @@
 * @version 0.8.0 [APG 2022/03/12] Porting to Deno
 * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
 * @version 0.9.1 [APG 2022/09/24] Github Beta
+* @version 0.9.2 [APG 2022/09/24] Enable / Disable 
 * -----------------------------------------------------------------------------
 */
 
@@ -22,10 +23,13 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
 
   /** Class name */
   readonly className: string;
+
   /** Stack for nested logBegin/logEnd methods */
   private __callsStack: string[] = [];
+
   /** Events logger */
   protected _logger: ApgLgr;
+  
   /** Logger enable/disable flag. Logging features are enabled by default */
   private __enabled = true;
 

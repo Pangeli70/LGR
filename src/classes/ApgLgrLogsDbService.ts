@@ -1,5 +1,5 @@
 /** -----------------------------------------------------------------------
- * @module [Logs]
+ * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.5.1 [APG 2019/03/24]
  * @version 0.7.0 [APG 2019/08/15]
@@ -10,7 +10,7 @@
  */
 
 import {
-  MongoDatabase, MongoCollection, Rst, Uts
+  MongoDatabase, MongoCollection, Rst
 } from "../../deps.ts"
 
 
