@@ -1,24 +1,48 @@
+/** -----------------------------------------------------------------------
+ * @module [Logs]
+ * @author [APG] ANGELI Paolo Giusto
+ * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * -----------------------------------------------------------------------
+ */
 import {
-    MongoDatabase, MongoCollection, DotEnv, Uts, Rst
+    MongoDatabase, MongoCollection,
+    DotEnv,
+    Uts, Rst, Mng
 } from "../deps.ts";
 
-// import * as Mng from "https://raw.githubusercontent.com/Pangeli70/apg-mng/master/mod.ts";
-import * as Mng from "../../MNG/mod.ts";
 import { IApgLgr } from "../src/interfaces/IApgLgr.ts";
-import { ApgLgr } from "../mod.ts";
+import { ApgLgr, ApgLgrLoggable } from "../mod.ts";
 
 const DB_NAME = "ApgTest";
 const COLLECTION_NAME = "Logs";
 
-export class ApgLgrTester {
+export class ApgLgrTester extends ApgLgrLoggable {
 
-    readonly CLASS_NAME = "ApgLgrTester";
-    readonly MTHD_NAME = "run";
+    constructor(alogger: ApgLgr) {
+        super(import.meta.url, alogger)
+    }
 
     async run(alocal: boolean) {
 
+        const MTHD_NAME = this.run.name;
+
+        const mongoService = await this.#setup(alocal);
+
+        this._logger.log(this.className, MTHD_NAME);
+
+        const errResult = Rst.ApgRstErrors.Unmanaged('Unmanaged test error');
+        this._logger.log(this.className, MTHD_NAME, errResult);
+
+        const totalTime = await this._logger.flush();
+        console.log("Logger flushed in " + totalTime.toFixed(2) + "ms.\n\n");
+
+        mongoService!.closeConnection();
+
+    }
+
+    async #setup(alocal: boolean) {
         console.log("\n");
-        console.log(this.CLASS_NAME + " " + ((alocal) ? "Local" : "Atlas"))
+        console.log(this.className + " " + ((alocal) ? "Local" : "Atlas"))
         console.log('-------------------------------------------------------------------------')
 
         const env = DotEnv.config()
@@ -43,7 +67,7 @@ export class ApgLgrTester {
         const mongoDBConnected = mongoService.Status.Ok;
 
         if (!mongoDBConnected) {
-            console.log(this.CLASS_NAME + " Error: Mongo DB not connected");
+            console.log(this.className + " Error: Mongo DB not connected");
             return;
         } else {
             console.log("Mongo DB connected")
@@ -58,7 +82,7 @@ export class ApgLgrTester {
         }
 
         if (logsCollection == undefined) {
-            console.log(this.CLASS_NAME + " Error: Logs collection not initialized");
+            console.log(this.className + " Error: Logs collection not initialized");
             return;
         }
         console.log("Logs collection connected")
@@ -71,17 +95,7 @@ export class ApgLgrTester {
         await ApgLgr.AddFileTransport('./test/data/', session + '.log');
         ApgLgr.AddMongoTransport(logsCollection, alocal);
 
-        const logger = new ApgLgr('Test logger');
-
-        logger.log(this.CLASS_NAME, this.MTHD_NAME);
-
-        const errResult = Rst.ApgRstErrors.Unmanaged('Unmanaged test error');
-        logger.log(this.CLASS_NAME, this.MTHD_NAME, errResult);
-
-        const totalTime = await logger.flush();
-        console.log("Logger flushed in " + totalTime.toFixed(2) + "ms.\n\n");
-
-        mongoService.closeConnection();
+        return mongoService;
 
     }
 

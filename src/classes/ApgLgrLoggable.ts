@@ -11,14 +11,14 @@
 * -----------------------------------------------------------------------------
 */
 
-import { Rst } from "../../deps.ts";
+import { Rst, Uts } from "../../deps.ts";
 import { ApgLgr } from './ApgLgr.ts';
 
 
 /** 
  * Base class for inheritance or composition of objects that can log events
  */
-export class ApgLgrLoggable {
+export class ApgLgrLoggable extends Uts.ApgUtsMeta {
 
   /** Class name */
   readonly className: string;
@@ -26,15 +26,28 @@ export class ApgLgrLoggable {
   private __callsStack: string[] = [];
   /** Events logger */
   protected _logger: ApgLgr;
+  /** Logger enable/disable flag. Logging features are enabled by default */
+  private __enabled = true;
 
+
+  logEnable() {
+    this.__enabled = true;
+  }
+
+  logDisable() {
+    Rst.ApgRstAssert.IsFalse(
+      this._logger.depth == 0,
+      "We can't disable the logging features before all the pending logEnd call have been called. The current depth is :" + this._logger.depth.toString(),
+      true)
+    this.__enabled = false;
+  }
 
   get #methodName() {
-
     return this.__callsStack[this.__callsStack.length - 1];
-
   }
 
   constructor(aclassName: string, alogger: ApgLgr) {
+    super(import.meta.url);
 
     this.className = aclassName;
 
@@ -63,6 +76,8 @@ export class ApgLgrLoggable {
 
   public logBegin(amethodName: string, aresult?: Rst.ApgRst) {
 
+    if (!this.__enabled) return;
+
     const BEGIN = "{"
 
     this.__callsStack.push(amethodName);
@@ -85,7 +100,7 @@ export class ApgLgrLoggable {
     amethodName: string,
     aresult?: Rst.ApgRst
   ) {
-
+    if (!this.__enabled) return;
     this.replaceLogger(alogger);
     this.logBegin(amethodName, aresult);
 
@@ -93,6 +108,8 @@ export class ApgLgrLoggable {
 
 
   public logEnd(aresult?: Rst.ApgRst) {
+
+    if (!this.__enabled) return;
 
     const END = '}';
 
@@ -112,8 +129,8 @@ export class ApgLgrLoggable {
   }
 
 
-   #updateMessageResult(aresult: Rst.IApgRst, amessage: string) {
-    
+  #updateMessageResult(aresult: Rst.IApgRst, amessage: string) {
+
     const r = new Rst.ApgRst({
       error: aresult.error,
       message: amessage,

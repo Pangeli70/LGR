@@ -20,7 +20,7 @@ import { IApgLgr } from "../interfaces/IApgLgr.ts";
 /**
  * Service to browse and purge logs Data
  */
-export abstract class ApgLgrLogsService extends Uts.ApgUtsSvcBase {
+export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
 
   protected _sessions: string[] = [];
 

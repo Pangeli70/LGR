@@ -1,13 +1,23 @@
+/** -----------------------------------------------------------------------
+ * @module [Logs]
+ * @author [APG] ANGELI Paolo Giusto
+ * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * -----------------------------------------------------------------------
+ */
 import {
-    MongoDatabase, MongoCollection, DotEnv, Uts, Rst
+    MongoDatabase,
+    MongoCollection,
+    DotEnv,
+    Mng
 } from "../deps.ts";
 
-//import * as Mng from "https://raw.githubusercontent.com/Pangeli70/apg-mng/master/mod.ts";
-import * as Mng from "../../MNG/mod.ts";
-
-
 import {
-    IApgLgr, ApgLgr, ApgLgrLogsService, ApgLgrLogsFsService, ApgLgrLogsDbService
+    ApgLgr,
+    IApgLgr,
+    ApgLgrLogsService,
+    ApgLgrLogsFsService,
+    ApgLgrLogsDbService,
+    ApgLgrLoggable
 } from "../mod.ts";
 
 export enum eApgLgrLogsTesterMode {
@@ -20,51 +30,10 @@ const DB_NAME = "ApgTest";
 const COLLECTION = "Logs";
 const KEEP_THE_LAST_N_SESSIONS = 3;
 
-export class ApgLgrLogsTester {
+export class ApgLgrLogsTester extends ApgLgrLoggable {
 
-    readonly CLASS_NAME = "ApgLgrLogsServiceTester";
-    readonly MTHD_NAME = "run";
-
-    do() {
-        console.log("Done");
-    }
-
-    async runFs() {
-
-        console.log("\n");
-        console.log(this.CLASS_NAME + " " + eApgLgrLogsTesterMode.localFs)
-        console.log('-------------------------------------------------------------------------')
-
-        const logsService = new ApgLgrLogsFsService('./test/data')
-
-        const r = await logsService.loadSessions();
-        if (!r.Ok) {
-            console.log(this.CLASS_NAME + " Error: loading sessions");
-            return;
-        }
-
-
-        const sessionsBeforePurge = logsService.ImmutableSessions;
-        await logsService.purgeOldSessions(KEEP_THE_LAST_N_SESSIONS);
-        const sessionsAfterPurge = logsService.ImmutableSessions;
-        const purged = sessionsBeforePurge.length - sessionsAfterPurge.length;
-        if (purged == 0) {
-            console.log(this.CLASS_NAME + " Warning: already purged all sessions");
-            return;
-        }
-        else {
-            console.log(`${this.CLASS_NAME}: Purged [${purged}] sessions.`)
-        }
-        const sessionId = sessionsAfterPurge[KEEP_THE_LAST_N_SESSIONS - 1];
-        const index = await logsService.getSessionIndexBySessionId(sessionId);
-        console.log(`The index of session [${sessionId}] is: [${index}]`);
-
-        const loggers = await logsService.loadLoggersFromSessionIndex(index);
-        console.log(`The session with index [${index}] contains: [${loggers.length}] loggers`);
-
-        const errors = await logsService.getLoggerWithFilteredEvents(index, loggers[0].id, true);
-        console.log(`The logger with id [${loggers[0].id}] contains: [${errors.events.length}] error events`);
-
+    constructor(alogger: ApgLgr) {
+        super(import.meta.url, alogger)
     }
 
     async #getLogsService(amode: eApgLgrLogsTesterMode) {
@@ -104,7 +73,7 @@ export class ApgLgrLogsTester {
         await mongoService!.initializeConnection();
         const mongoDBConnected = mongoService!.Status.Ok;
         if (!mongoDBConnected) {
-            console.log(this.CLASS_NAME + " Error: Mongo DB not connected");
+            console.log(this.className + " Error: Mongo DB not connected");
             return;
         } else {
             console.log("Mongo DB connected")
@@ -116,7 +85,7 @@ export class ApgLgrLogsTester {
         }
 
         if (logsCollection == undefined) {
-            console.log(this.CLASS_NAME + " Error: Logs collection not initialized");
+            console.log(this.className + " Error: Logs collection not initialized");
             return;
         }
         console.log("Logs collection connected")
@@ -129,7 +98,7 @@ export class ApgLgrLogsTester {
     async run(amode: eApgLgrLogsTesterMode) {
 
         console.log("\n");
-        console.log(this.CLASS_NAME + " " + amode)
+        console.log(this.className + " " + amode)
         console.log('-------------------------------------------------------------------------')
         let logsService: ApgLgrLogsService;
         try {
@@ -140,7 +109,7 @@ export class ApgLgrLogsTester {
 
         const r = await logsService!.loadSessions();
         if (!r.Ok) {
-            console.log(this.CLASS_NAME + " Error: loading sessions");
+            console.log(this.className + " Error: loading sessions");
             return;
         }
         const sessionsBeforePurge = logsService!.ImmutableSessions;
@@ -148,11 +117,11 @@ export class ApgLgrLogsTester {
         const sessionsAfterPurge = logsService!.ImmutableSessions;
         const purged = sessionsBeforePurge.length - sessionsAfterPurge.length;
         if (purged == 0) {
-            console.log(this.CLASS_NAME + " Error: purged all sessions");
+            console.log(this.className + " Error: purged all sessions");
             return;
         }
         else {
-            console.log(`${this.CLASS_NAME}: Purged [${purged}] sessions.`)
+            console.log(`${this.className}: Purged [${purged}] sessions.`)
         }
 
         const sessionId = sessionsAfterPurge[KEEP_THE_LAST_N_SESSIONS - 1];
