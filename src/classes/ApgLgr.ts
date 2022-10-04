@@ -12,7 +12,7 @@
  */
 
 import {
-  MongoCollection, StdPath, Uts, Rst
+  MongoCollection, StdPath, Uts, Rst, Mng
 } from '../../deps.ts';
 
 import { ApgLgrEvent } from './ApgLgrEvent.ts'
@@ -146,16 +146,21 @@ export class ApgLgr {
       type: eApgLgrTransportTypes.file,
       file: StdPath.join(path, "/", afile)
     }
+    
     ApgLgr._transports.set(eApgLgrTransportTypes.file, fileTransport);
   }
 
-  static AddMongoTransport(acollection: MongoCollection<IApgLgr>, alocal: boolean) {
+  static AddMongoTransport(acollection: MongoCollection<IApgLgr>, amode: Mng.eApgMngMode) {
 
-    const transportType = (alocal) ? eApgLgrTransportTypes.mongoLocal : eApgLgrTransportTypes.mongoAtlas
+    const transportType = (amode == Mng.eApgMngMode.local) ?
+      eApgLgrTransportTypes.mongoLocal :
+      eApgLgrTransportTypes.mongoAtlas;
+    
     const mongoTransport: IApgLgrTransport = {
       type: transportType,
       collection: acollection
     }
+
     ApgLgr._transports.set(transportType, mongoTransport);
 
   }

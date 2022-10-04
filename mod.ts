@@ -1,3 +1,8 @@
+/** -----------------------------------------------------------------------
+ * @module [Lgr] Logging and profiling utilities
+ * @author [APG] ANGELI Paolo Giusto
+ * -----------------------------------------------------------------------
+ */
 export * from './src/classes/ApgLgr.ts';
 export * from './src/classes/ApgLgrEvent.ts';
 export * from './src/classes/ApgLgrLoggable.ts';

@@ -10,7 +10,7 @@
  */
 
 import {
-  MongoDatabase, MongoCollection, Rst
+  MongoCollection, Rst
 } from "../../deps.ts"
 
 
@@ -23,30 +23,16 @@ import { ApgLgrLogsService } from "./ApgLgrLogsService.ts";
  */
 export class ApgLgrLogsDbService extends ApgLgrLogsService {
 
-  readonly META_NAME = "ApgLgrLogsDbService"
-
-  private _dataBase?: MongoDatabase;
-
   private _collection?: MongoCollection<IApgLgr>;
 
-
-
-  constructor(adataSource: MongoDatabase, acollectionName: string) {
+  constructor(acollection: MongoCollection<IApgLgr>) {
 
     super(import.meta.url);
 
-    const isDatabase = adataSource instanceof MongoDatabase;
-    Rst.ApgRstAssert.IsFalse(
-      isDatabase,
-      `${this.CLASS_NAME}.constructor: datasource should be a MongoDatabase`,
-      true
-    );
-
-    this._dataBase = adataSource;
-    this._collection = this._dataBase.collection(acollectionName);
+    this._collection = acollection;
     Rst.ApgRstAssert.IsUndefined(
       this._collection,
-      `${this.CLASS_NAME}.constructor: The database doesn't contain the ${acollectionName} collection`,
+      `${this.CLASS_NAME}.constructor: The database doesn't contain the logs collection`,
       true
     );
 

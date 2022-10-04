@@ -2,22 +2,22 @@
   "id": 1,
   "session": "",
   "name": "Test logger",
-  "creationTime": "2022-10-02T12:56:03.399Z",
-  "creationHrt": 437.9304,
+  "creationTime": "2022-10-04T22:11:37.646Z",
+  "creationHrt": 9463.8414,
   "events": [
     {
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-02-14-56-03",
-      "hrt": 479.5004
+      "dateTimeStamp": "2022-10-05-00-11-50",
+      "hrt": 22052.716
     },
     {
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-02-14-56-03",
-      "hrt": 481.3164,
+      "dateTimeStamp": "2022-10-05-00-11-50",
+      "hrt": 22053.2676,
       "result": {
         "error": 21,
         "message": "Unmanaged test error"
@@ -26,5 +26,5 @@
   ],
   "depth": 0,
   "hasErrors": true,
-  "totalHrt": 55.61579999999998
+  "totalHrt": 12590.219200000001
 }

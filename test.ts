@@ -1,29 +1,31 @@
+/** -----------------------------------------------------------------------
+ * @module [Lgr]
+ * @author [APG] ANGELI Paolo Giusto
+ * @version 0.9.2 [APG 2022/09/24] Github Beta
+ * -----------------------------------------------------------------------
+ */
+
+import { Mng } from "./deps.ts";
+import { ApgLgr } from "./mod.ts";
 import * as lgrTester from "./test/ApgLgrTester.ts"
 import * as logsTester from "./test/ApgLgrLogsTester.ts"
-import { ApgLgr } from "./mod.ts";
+import { eApgLgrLogsTesterMode } from "./test/eApgLgrLogsTesterMode.ts";
 
 
-async function testFn() {
+const logger = new ApgLgr('Test logger');
 
+const t1 = new lgrTester.ApgLgrTester(logger);
 
-    const logger = new ApgLgr('Test logger');
-    
-    const t1 = new lgrTester.ApgLgrTester(logger);
-    const local = true;
-    const atlas = false;
+await t1.run(Mng.eApgMngMode.local);
+await t1.run(Mng.eApgMngMode.atlas);
 
-    await t1.run(local);
-    await t1.run(atlas);
+const t2 = new logsTester.ApgLgrLogsTester(logger);
 
-    const t2 = new logsTester.ApgLgrLogsTester(logger);
+await t2.run(eApgLgrLogsTesterMode.localFs);
+await t2.run(eApgLgrLogsTesterMode.localDb);
+await t2.run(eApgLgrLogsTesterMode.atlasDb);
 
-    await t2.run(logsTester.eApgLgrLogsTesterMode.localFs);
-    await t2.run(logsTester.eApgLgrLogsTesterMode.localDb);
-    await t2.run(logsTester.eApgLgrLogsTesterMode.atlasDb);
+console.log("Test terminated");
 
-    console.log("Test terminated");
-}
-
-await testFn();
 Deno.exit();
 
