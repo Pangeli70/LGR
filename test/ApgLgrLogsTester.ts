@@ -114,7 +114,7 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
         console.log(`The logger with id [${loggers[0].id}] contains: [${loggerWithErrors.events.length}] error events`);
 
         if (this._connector != null) { 
-            this._connector.disconenct();
+            this._connector.disconnect();
         }
 
     }

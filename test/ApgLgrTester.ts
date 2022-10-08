@@ -34,7 +34,7 @@ export class ApgLgrTester extends ApgLgrLoggable {
         const totalTime = await this._logger.flush();
         console.log("Logger flushed in " + totalTime.toFixed(2) + "ms.\n\n");
 
-        connector!.disconenct();
+        connector!.disconnect();
 
     }
 
