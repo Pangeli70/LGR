@@ -19,9 +19,9 @@ export {
 } from "https://deno.land/x/mongo@v0.29.3/mod.ts";
 
 export type {
-    FindOptions,
-    CountOptions,
-    ConnectOptions
+    FindOptions as MongoFindOpts,
+    CountOptions as MongoCountOpts, 
+    ConnectOptions as MongoConnOpts
 } from "https://deno.land/x/mongo@v0.29.3/mod.ts";
 
 //deno.land/x/web_bson

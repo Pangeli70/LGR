@@ -2,22 +2,22 @@
   "id": 1,
   "session": "",
   "name": "Test logger",
-  "creationTime": "2022-10-04T22:11:39.625Z",
-  "creationHrt": 13406.9113,
+  "creationTime": "2022-10-10T21:29:48.497Z",
+  "creationHrt": 414.8928,
   "events": [
     {
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-05-00-11-39",
-      "hrt": 13659.5851
+      "dateTimeStamp": "2022-10-10-23-29-48",
+      "hrt": 707.7325
     },
     {
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-05-00-11-39",
-      "hrt": 13660.1877,
+      "dateTimeStamp": "2022-10-10-23-29-48",
+      "hrt": 708.0707,
       "result": {
         "error": 21,
         "message": "Unmanaged test error"
@@ -27,15 +27,15 @@
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-05-00-11-41",
-      "hrt": 15081.3099
+      "dateTimeStamp": "2022-10-10-23-29-51",
+      "hrt": 3841.1919
     },
     {
       "depth": 0,
       "className": "file:///C:/APG/Dev/Web/Deno/LGR/test/ApgLgrTester.ts",
       "method": "run",
-      "dateTimeStamp": "2022-10-05-00-11-41",
-      "hrt": 15081.903,
+      "dateTimeStamp": "2022-10-10-23-29-51",
+      "hrt": 3841.4461,
       "result": {
         "error": 21,
         "message": "Unmanaged test error"
@@ -44,6 +44,6 @@
   ],
   "depth": 0,
   "hasErrors": true,
-  "totalHrt": 1675.8634999999995,
-  "_id": "633caf9b39ec4a9fa719981a"
+  "totalHrt": 3427.3750999999997,
+  "_id": "63448eccdc7fb2f21d69518e"
 }
