@@ -25,7 +25,10 @@ await t2.run(eApgLgrLogsTesterMode.localFs);
 await t2.run(eApgLgrLogsTesterMode.localDb);
 await t2.run(eApgLgrLogsTesterMode.atlasDb);
 
-console.log("Test terminated");
+console.log("+----------------------------- Deno Resources ----------------------------------");
+console.dir(Deno.resources());
+console.log("+-------------------------------------------------------------------------------");
+console.log("|                 >>>>>        Test terminated      <<<<<");
+console.log("+-------------------------------------------------------------------------------");
 
-Deno.exit();
 
