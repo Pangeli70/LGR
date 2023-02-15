@@ -4,6 +4,7 @@
  * @version 0.5.1 [APG 2019/03/24]
  * @version 0.8.0 [APG 2022/03/19] Porting to Deno
  * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -25,5 +26,5 @@ export interface IApgLgrEvent {
   hrt: number;
 
   /** Internal error code of the event */
-  result?: Rst.ApgRst;
+  result?: Rst.IApgRst;
 }

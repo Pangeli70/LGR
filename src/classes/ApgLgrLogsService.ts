@@ -6,6 +6,7 @@
  * @version 0.8.0 [APG 2022/03/19] Porting to Deno
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -33,7 +34,7 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
     return Uts.ApgUtsObj.DeepFreeze(this._sessions);
   }
 
-  abstract loadSessions(): Promise<Rst.ApgRst>;
+  abstract loadSessions(): Promise<Rst.IApgRst>;
 
 
   protected sortSessionsDescending() {
@@ -54,7 +55,7 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
 
   abstract loadLoggersFromSessionIndex(asessionIndex: number): Promise<IApgLgr[]>;
 
-  abstract purgeOldSessions(akeepTheLast: number): Promise<Rst.ApgRst>;
+  abstract purgeOldSessions(akeepTheLast: number): Promise<Rst.IApgRst>;
 
   
   async getLoggerWithFilteredEvents(
@@ -76,7 +77,7 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
 
     if (aerrorsOnly) {
 
-      r.events = r.events.filter(aevent => (aevent.result! && !aevent.result.Ok) )
+      r.events = r.events.filter(aevent => (aevent.result! && !aevent.result.ok) )
 
     }
     return r;

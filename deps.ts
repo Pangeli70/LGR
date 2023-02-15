@@ -32,5 +32,6 @@ export {
 // https://github
 export * as Uts from "https://raw.githubusercontent.com/Pangeli70/apg-uts/master/mod.ts";
 export * as Rst from "https://raw.githubusercontent.com/Pangeli70/apg-rst/master/mod.ts";
+//export * as Rst from "../RST/mod.ts";
 export * as Mng from "https://raw.githubusercontent.com/Pangeli70/apg-mng/master/mod.ts";
-//export * as Mng from "../../MNG/mod.ts";
+//export * as Mng from "../MNG/mod.ts";

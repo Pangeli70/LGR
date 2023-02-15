@@ -8,6 +8,7 @@
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Splitting renaming etc 
  * @version 0.9.2 [APG 2022/09/24] Github Beta 
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -79,7 +80,7 @@ export class ApgLgr {
   log(
     aclass: string,
     amethod: string,
-    aresult?: Rst.ApgRst
+    aresult?: Rst.IApgRst
   ) {
 
     const r = new ApgLgrEvent(
@@ -91,15 +92,15 @@ export class ApgLgr {
     this.events.push(r);
 
     if (aresult) {
-      if (!aresult.Ok) {
+      if (!aresult.ok) {
         this.hasErrors = true;
       }
       if (ApgLgr._transports.has(eApgLgrTransportTypes.console)) {
         console.log(`${this.name} => ${aclass}.${amethod}:`);
-        const r = aresult.AsImmutableIApgRst;
-        console.log(`    (code:${r.error}) message: ${r.message}`);
-        if (r.payload) {
-          console.dir(r.payload);
+        const message = Rst.ApgRst.InterpolateMessage(aresult)
+        console.log(`    message: ${message}`);
+        if (aresult.payload) {
+          console.dir(aresult.payload);
         }
       }
     }

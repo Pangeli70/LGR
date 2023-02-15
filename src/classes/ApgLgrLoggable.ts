@@ -1,15 +1,16 @@
 /** ---------------------------------------------------------------------------
-* @module [Logs]
-* @author [APG] ANGELI Paolo Giusto
-* @version 0.2.0 [APG 2018/06/02]
-* @version 0.5.1 [APG 2019/01/07]
-* @version 0.7.0 [APG 2019/08/15]
-* @version 0.7.1 [APG 2019/08/27]
-* @version 0.8.0 [APG 2022/03/12] Porting to Deno
-* @version 0.9.0 [APG 2022/08/09] Code smells and metrics
-* @version 0.9.1 [APG 2022/09/24] Github Beta
-* @version 0.9.2 [APG 2022/09/24] Enable / Disable 
-* -----------------------------------------------------------------------------
+ * @module [Lgr]
+ * @author [APG] ANGELI Paolo Giusto
+ * @version 0.2.0 [APG 2018/06/02]
+ * @version 0.5.1 [APG 2019/01/07]
+ * @version 0.7.0 [APG 2019/08/15]
+ * @version 0.7.1 [APG 2019/08/27]
+ * @version 0.8.0 [APG 2022/03/12] Porting to Deno
+ * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
+ * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.2 [APG 2022/09/24] Enable / Disable
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
+ * -----------------------------------------------------------------------------
 */
 
 import { Rst, Uts } from "../../deps.ts";
@@ -25,30 +26,18 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
   readonly className: string;
 
   /** Stack for nested logBegin/logEnd methods */
-  private __callsStack: string[] = [];
+  private _callsStack: string[] = [];
 
   /** Events logger */
-  protected _logger: ApgLgr;
+  protected logger: ApgLgr;
+
+  /** Constructor events logger */
+  private _constructorLogger: ApgLgr;
   
   /** Logger enable/disable flag. Logging features are enabled by default */
-  private __enabled = true;
+  private _enabled = true;
 
 
-  logEnable() {
-    this.__enabled = true;
-  }
-
-  logDisable() {
-    Rst.ApgRstAssert.IsFalse(
-      this._logger.depth == 0,
-      "We can't disable the logging features before all the pending logEnd call have been called. The current depth is :" + this._logger.depth.toString(),
-      true)
-    this.__enabled = false;
-  }
-
-  get #methodName() {
-    return this.__callsStack[this.__callsStack.length - 1];
-  }
 
   constructor(aclassName: string, alogger: ApgLgr) {
     super(import.meta.url);
@@ -61,12 +50,32 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
       true
     );
 
-    this._logger = alogger;
+    this.logger = alogger;
+    this._constructorLogger = alogger;
 
   }
 
 
-  public replaceLogger(alogger: ApgLgr) {
+  logEnable() {
+    this._enabled = true;
+  }
+
+
+  logDisable() {
+    Rst.ApgRstAssert.IsFalse(
+      this.logger.depth == 0,
+      "We can't disable the logging features before all the pending logEnd call have been called. The current depth is :" + this.logger.depth.toString(),
+      true)
+    this._enabled = false;
+  }
+
+
+  get #methodName() {
+    return this._callsStack[this._callsStack.length - 1];
+  }
+
+
+  public logReplaceLogger(alogger: ApgLgr) {
 
     Rst.ApgRstAssert.IsUndefined(
       alogger,
@@ -74,24 +83,29 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
       true
     );
 
-    this._logger = alogger;
+    this.logger = alogger;
   }
 
 
-  public logBegin(amethodName: string, aresult?: Rst.ApgRst) {
+  public logRestoreConstructorLogger() {
 
-    if (!this.__enabled) return;
+    this.logger = this._constructorLogger;
+  }
+
+
+  public logBegin(amethodName: string, aresult?: Rst.IApgRst) {
+
+    if (!this._enabled) return;
 
     const BEGIN = "{"
 
-    this.__callsStack.push(amethodName);
-    this._logger.depth++;
+    this._callsStack.push(amethodName);
+    this.logger.depth++;
 
     if (aresult) {
-      const ir = aresult.AsIApgRst;
-      const message = ir.message ? BEGIN + " => " + ir.message : BEGIN
-      const r = this.#updateMessageResult(ir, message);
-      this.#logResult(r);
+      const message = aresult.message ? BEGIN + " => " + aresult.message : BEGIN
+      aresult.message = message;
+      this.#logResult(aresult);
     }
     else {
       this.logTrace(BEGIN);
@@ -102,46 +116,33 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
   logBeginUsing(
     alogger: ApgLgr,
     amethodName: string,
-    aresult?: Rst.ApgRst
+    aresult?: Rst.IApgRst
   ) {
-    if (!this.__enabled) return;
-    this.replaceLogger(alogger);
+    if (!this._enabled) return;
+    this.logReplaceLogger(alogger);
     this.logBegin(amethodName, aresult);
 
   }
 
 
-  public logEnd(aresult?: Rst.ApgRst) {
+  public logEnd(aresult?: Rst.IApgRst) {
 
-    if (!this.__enabled) return;
+    if (!this._enabled) return;
 
     const END = '}';
 
     if (aresult) {
-      const ir = aresult.AsIApgRst;
-      const message = ir.message ? END + " => " + ir.message : END
-      const r = this.#updateMessageResult(ir, message);
-      this.#logResult(r);
+      const message = aresult.message ? END + " => " + aresult.message : END
+      aresult.message = message;
+      this.#logResult(aresult);
     }
     else {
       this.logTrace(END);
     }
 
-    this._logger.depth--;
-    this.__callsStack.pop();
+    this.logger.depth--;
+    this._callsStack.pop();
 
-  }
-
-
-  #updateMessageResult(aresult: Rst.IApgRst, amessage: string) {
-
-    const r = new Rst.ApgRst({
-      error: aresult.error,
-      message: amessage,
-      payload: aresult.payload,
-      codedMessage: aresult.codedMessage
-    });
-    return r;
   }
 
 
@@ -149,15 +150,15 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
     amessage: string
   ) {
 
-    const r = new Rst.ApgRst({ message: amessage })
+    const r: Rst.IApgRst = { ok: true, message: amessage };
     return this.#logResult(r)
 
   }
 
 
-  #logResult(aresult: Rst.ApgRst) {
+  #logResult(aresult: Rst.IApgRst) {
 
-    return this._logger.log(this.className, this.#methodName, aresult);
+    return this.logger.log(this.className, this.#methodName, aresult);
 
   }
 

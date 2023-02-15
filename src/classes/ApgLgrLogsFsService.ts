@@ -6,6 +6,7 @@
  * @version 0.8.0 [APG 2022/03/19] Porting to Deno
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -44,7 +45,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
     this.sortSessionsDescending();
 
     //return new Promise((resolve) => resolve(fs.readFileSync(filePath, { 'encoding': 'utf8' })));
-    const r = new Promise<Rst.ApgRst>((resolve) => resolve(new Rst.ApgRst()));
+    const r = new Promise<Rst.IApgRst>((resolve) => resolve({ ok: true }));
     return await r;
   }
 
@@ -78,6 +79,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
     const rawJson = "[" + await Deno.readTextFile(file) + "]";
 
+    // TODO @2 -- APG20230214 - Warning this can throw
     const json = JSON.parse(rawJson);
 
     const r = json as IApgLgr[];
@@ -98,12 +100,12 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
       await this.loadSessions();
     }
 
-    let r = new Rst.ApgRst();
+    let r: Rst.IApgRst = { ok : true };
 
     try {
       await this.#removeSessionFiles(akeepTheLastN);
     } catch (_error) {
-      r = Rst.ApgRstErrors.Unmanaged('Error purging old session files:' + _error.message);
+      r = Rst.ApgRstErrors.Simple('Error purging old session files:' + _error.message);
     }
 
     return r;
@@ -111,6 +113,8 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
 
   async #removeSessionFiles(akeepTheLastN: number) {
+
+    // TODO @2 -- APG20230214 - Is deploy ??? Do we have permissions
 
     const end = akeepTheLastN - 1;
     const begin = this._sessions.length - 1

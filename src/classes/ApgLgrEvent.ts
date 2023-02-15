@@ -7,6 +7,7 @@
  * @version 0.8.0 [APG 2022/03/19] Porting to Deno
  * @version 0.8.1 [APG 2022/04/23] Added session Id
  * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -24,14 +25,14 @@ export class ApgLgrEvent implements IApgLgrEvent {
   method = '';
   dateTimeStamp: string;
   hrt: number;
-  result?: Rst.ApgRst;
+  result?: Rst.IApgRst;
 
 
   constructor(
     adepth: number,
     aclass: string,
     amethod: string,
-    aresult?: Rst.ApgRst
+    aresult?: Rst.IApgRst
   ) {
     this.depth = adepth;
     this.className = aclass;

@@ -6,6 +6,7 @@
  * @version 0.8.0 [APG 2022/03/19] Porting to Deno
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Github Beta
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification 
  * -----------------------------------------------------------------------
  */
 
@@ -45,7 +46,7 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
 
     this.sortSessionsDescending();
 
-    return new Rst.ApgRst();
+    return { ok: true } as Rst.IApgRst;
 
   }
 
@@ -109,17 +110,19 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
 
   async purgeOldSessions(akeepTheLast: number) {
 
-    const r = new Rst.ApgRst();
+    const r = { ok: true } as Rst.IApgRst;
     const n = await this.#purgeSessionsDocumentsFromDb(akeepTheLast);
     const p: Rst.IApgRstPayload = {
       signature: "number",
       data: n
     }
-    r.setPayload(p)
+    r.payload = p;
     return r;
 
   }
 
+
+  
   async #purgeSessionsDocumentsFromDb(akeepTheLast: number) {
 
     const lastSession = this._sessions[akeepTheLast - 1];
