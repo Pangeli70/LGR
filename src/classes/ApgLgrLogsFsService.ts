@@ -79,7 +79,8 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
     const rawJson = "[" + await Deno.readTextFile(file) + "]";
 
-    // TODO @2 -- APG20230214 - Warning this can throw
+    // TODO @2 Warning this can throw -- APG20230214
+    // TODO @3 Sanitize all JSON.parse and JSON.stringify all over the world -- APG20230306
     const json = JSON.parse(rawJson);
 
     const r = json as IApgLgr[];
@@ -114,7 +115,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
   async #removeSessionFiles(akeepTheLastN: number) {
 
-    // TODO @2 -- APG20230214 - Is deploy ??? Do we have permissions
+    // TODO @2 Is deploy ??? Do we have permissions -- APG20230214
 
     const end = akeepTheLastN - 1;
     const begin = this._sessions.length - 1
