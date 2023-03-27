@@ -9,7 +9,8 @@
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Github Beta
  * @version 0.9.2 [APG 2022/09/24] Enable / Disable
- * @version 0.9.5 [APG 2023/02/14] Rst simplification 
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification
+ * @version 0.9.6 [APG 2023/03/18] Changed LogEnd logic.
  * -----------------------------------------------------------------------------
 */
 
@@ -33,7 +34,7 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
 
   /** Constructor events logger */
   private _constructorLogger: ApgLgr;
-  
+
   /** Logger enable/disable flag. Logging features are enabled by default */
   private _enabled = true;
 
@@ -131,8 +132,8 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
 
     const END = '}';
 
-    if (aresult) {
-      const message = aresult.message ? END + " => " + aresult.message : END
+    if (aresult && !aresult.ok) {
+      const message = END + aresult.message ? " => " + aresult.message : ''
       aresult.message = message;
       this.#logResult(aresult);
     }
