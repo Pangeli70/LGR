@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "noImplicitOverride": true
-  },
-  "tasks": {
-    "test": "deno run -A --unstable --watch test.ts",
-    "cache": "deno cache --reload deps.ts"
-  }
-}
