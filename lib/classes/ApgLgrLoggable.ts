@@ -1,5 +1,5 @@
 /** ---------------------------------------------------------------------------
- * @module [Lgr]
+ * @module [apg-lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.2.0 [APG 2018/06/02]
  * @version 0.5.1 [APG 2019/01/07]
@@ -11,10 +11,11 @@
  * @version 0.9.2 [APG 2022/09/24] Enable / Disable
  * @version 0.9.5 [APG 2023/02/14] Rst simplification
  * @version 0.9.6 [APG 2023/03/18] Changed LogEnd logic.
+ * @version 0.9.7 [APG 2023/05/08] Separation of concerns lib/srv
  * -----------------------------------------------------------------------------
 */
 
-import { Rst, Uts } from "../../deps.ts";
+import { Rst, Uts } from "../deps.ts";
 import { ApgLgr } from './ApgLgr.ts';
 
 

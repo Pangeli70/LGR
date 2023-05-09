@@ -4,18 +4,9 @@
  * @version 0.9.2 [APG 2022/09/24] Github Beta
  * -----------------------------------------------------------------------
  */
-import {
-    Mng
-} from "../deps.ts";
+import { Mng } from "../deps.ts";
 
-import {
-    ApgLgr,
-    IApgLgr,
-    ApgLgrLogsService,
-    ApgLgrLogsFsService,
-    ApgLgrLogsDbService,
-    ApgLgrLoggable
-} from "../mod.ts";
+import * as Lgr from "../../lib/mod.ts";
 
 import { eApgLgrLogsTesterMode } from "./eApgLgrLogsTesterMode.ts";
 
@@ -23,19 +14,19 @@ const DB_NAME = "ApgTest";
 const COLLECTION_NAME = "Logs";
 const KEEP_THE_LAST_N_SESSIONS = 3;
 
-export class ApgLgrLogsTester extends ApgLgrLoggable {
+export class ApgLgrLogsTester extends Lgr.ApgLgrLoggable {
 
     private _connector: Mng.ApgMngConnector | null = null;
 
-    constructor(alogger: ApgLgr) {
+    constructor(alogger: Lgr.ApgLgr) {
         super(import.meta.url, alogger)
     }
 
     async #getLogsService(amode: eApgLgrLogsTesterMode) {
 
-        let r: ApgLgrLogsService;
+        let r: Lgr.ApgLgrLogsService;
         if (amode == eApgLgrLogsTesterMode.localFs) {
-            r = new ApgLgrLogsFsService('./test/data')
+            r = new Lgr.ApgLgrLogsFsService('./test/data')
         }
         else {
             this._connector = new Mng.ApgMngConnector();
@@ -43,19 +34,19 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
             if (!logsCollections) {
                 return null;
             }
-            r = new ApgLgrLogsDbService(logsCollections)
+            r = new Lgr.ApgLgrLogsDbService(logsCollections)
         }
         return r;
     }
 
 
-    async #getLogsCollection(aconnector : Mng.ApgMngConnector, amode: eApgLgrLogsTesterMode) {
+    async #getLogsCollection(aconnector: Mng.ApgMngConnector, amode: eApgLgrLogsTesterMode) {
 
-        let dbMode = Mng.eApgMngMode.local; 
+        let dbMode = Mng.eApgMngMode.local;
         if (amode == eApgLgrLogsTesterMode.atlasDb) dbMode = Mng.eApgMngMode.atlas;
 
         await aconnector.connect(dbMode, DB_NAME);
-        const logs = aconnector.getCollection<IApgLgr>(COLLECTION_NAME);
+        const logs = aconnector.getCollection<Lgr.IApgLgr>(COLLECTION_NAME);
 
         if (logs == undefined) {
             console.log(this.className + " Error: Logs collection not initialized");
@@ -73,7 +64,7 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
         console.log("\n");
         console.log(this.className + " " + amode)
         console.log('-------------------------------------------------------------------------')
-        let logsService: ApgLgrLogsService | null = null;
+        let logsService: Lgr.ApgLgrLogsService | null = null;
         try {
             logsService = await this.#getLogsService(amode);
         } catch (e) {
@@ -82,11 +73,11 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
 
         if (logsService == null) {
             console.log(this.className + " Error: Logs service not available");
-            return ;
+            return;
         }
 
         const r = await logsService!.loadSessions();
-        if (!r.Ok) {
+        if (!r.ok) {
             console.log(this.className + " Error: loading sessions");
             return;
         }
@@ -113,7 +104,7 @@ export class ApgLgrLogsTester extends ApgLgrLoggable {
         const loggerWithErrors = await logsService!.getLoggerWithFilteredEvents(index, loggers[0].id, true);
         console.log(`The logger with id [${loggers[0].id}] contains: [${loggerWithErrors.events.length}] error events`);
 
-        if (this._connector != null) { 
+        if (this._connector != null) {
             this._connector.disconnect();
         }
 

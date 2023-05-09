@@ -1,5 +1,5 @@
 /** ----------------------------------------------------------------------
- * @module [Lgr]
+ * @module [apg-lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.2.0 [APG 2018/06/02]
  * @version 0.5.0 [APG 2018/11/24]
@@ -8,13 +8,14 @@
  * @version 0.9.0 [APG 2022/08/09] Code smells and metrics
  * @version 0.9.1 [APG 2022/09/24] Splitting renaming etc 
  * @version 0.9.2 [APG 2022/09/24] Github Beta 
- * @version 0.9.5 [APG 2023/02/14] Rst simplification 
+ * @version 0.9.5 [APG 2023/02/14] Rst simplification
+ * @version 0.9.7 [APG 2023/05/08] Separation of concerns lib/srv
  * -----------------------------------------------------------------------
  */
 
 import {
   MongoCollection, StdPath, Uts, Rst, Mng
-} from '../../deps.ts';
+} from '../deps.ts';
 
 import { ApgLgrEvent } from './ApgLgrEvent.ts'
 import { IApgLgr } from '../interfaces/IApgLgr.ts'
