@@ -8,7 +8,7 @@
 export * from './classes/ApgLgr.ts';
 export * from './classes/ApgLgrEvent.ts';
 export * from './classes/ApgLgrLoggable.ts';
-export * from './classes/ApgLgrLogsDbService.ts';
+export * from './classes/ApgLgrLogsMongoDbService.ts';
 export * from './classes/ApgLgrLogsFsService.ts';
 export * from './classes/ApgLgrLogsService.ts';
 

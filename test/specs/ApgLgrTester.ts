@@ -2,6 +2,7 @@
  * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.9.2 [APG 2022/09/24] Github Beta
+ * @version 0.9.7 [APG 2023/05/27] Separation of concerns lib/src
  * -----------------------------------------------------------------------
  */
 import { Uts, Rst, Mng } from "../deps.ts";
@@ -53,7 +54,7 @@ export class ApgLgrTester extends Lgr.ApgLgrLoggable {
         }
         console.log("Logs collection connected")
 
-        const session = new Uts.ApgUtsDateTimeStamp(new Date()).Value;
+        const session = new Uts.ApgUtsDateTimeStamp(new Date()).Stamp;
         Lgr.ApgLgr.Session(session);
 
         Lgr.ApgLgr.ClearTrasports();

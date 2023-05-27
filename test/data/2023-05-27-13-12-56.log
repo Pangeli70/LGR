@@ -1,0 +1,31 @@
+{
+  "id": 1,
+  "session": "",
+  "name": "Testing logger",
+  "creationTime": "2023-05-27T11:12:56.965Z",
+  "creationHrt": 79.1653,
+  "events": [
+    {
+      "depth": 0,
+      "className": "file:///C:/Apg/Dev/Web/Deno/apg-lgr/test/specs/ApgLgrTester.ts",
+      "method": "run",
+      "dateTimeStamp": "2023-05-27-13-12-56",
+      "hrt": 102.1145
+    },
+    {
+      "depth": 0,
+      "className": "file:///C:/Apg/Dev/Web/Deno/apg-lgr/test/specs/ApgLgrTester.ts",
+      "method": "run",
+      "dateTimeStamp": "2023-05-27-13-12-56",
+      "hrt": 102.2828,
+      "result": {
+        "ok": false,
+        "message": "Unmanaged test error"
+      }
+    }
+  ],
+  "_depth": 0,
+  "_hasErrors": true,
+  "_totalHrt": 23.856399999999994,
+  "collectMemoryUsage": false
+}

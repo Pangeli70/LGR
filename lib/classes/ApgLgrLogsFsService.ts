@@ -11,7 +11,7 @@
  * -----------------------------------------------------------------------
  */
 
-import { Rst, StdPath, Uts } from "../deps.ts"
+import { Rst, Uts } from "../deps.ts"
 import { IApgLgr } from "../interfaces/IApgLgr.ts";
 import { ApgLgrLogsService } from "./ApgLgrLogsService.ts";
 
@@ -35,13 +35,14 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
   }
 
 
-  async loadSessions() {
+  override async loadSessions() {
 
     this._sessions = this.#readLogSessionsFromDiskSync();
 
     this.sortSessionsDescending();
 
     //return new Promise((resolve) => resolve(fs.readFileSync(filePath, { 'encoding': 'utf8' })));
+    // Warning This is a fake to fullfill async overloading
     const r = new Promise<Rst.IApgRst>((resolve) => resolve({ ok: true }));
     return await r;
   }
@@ -54,7 +55,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
   }
 
-  async loadLoggersFromSessionIndex(asessionIndex: number) {
+  override async loadLoggersFromSessionIndex(asessionIndex: number) {
 
     if (!this.IsReady) {
       await this.loadSessions();
@@ -66,7 +67,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
 
   async #loadLoggersFromFile(asessionIndex: number) {
 
-    const file = StdPath.resolve(this._dataFolder + "/" + this._sessions[asessionIndex]);
+    const file = Uts.Std.Path.resolve(this._dataFolder + "/" + this._sessions[asessionIndex]);
 
     const fileExists = Uts.ApgUtsFs.FileExistsSync(file);
     Rst.ApgRstAssert.IsFalse(
@@ -85,7 +86,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
     return r;
   }
 
-  async purgeOldSessions(akeepTheLast: number) {
+  override async purgeOldSessions(akeepTheLast: number) {
 
     const r = await this.#purgeSessionFilesFromDisk(akeepTheLast);
     return r;
@@ -117,7 +118,7 @@ export class ApgLgrLogsFsService extends ApgLgrLogsService {
     const end = akeepTheLastN - 1;
     const begin = this._sessions.length - 1
     for (let i = begin; i > end; i--) {
-      const afile = StdPath.resolve(this._dataFolder + "/" + this._sessions[i]);
+      const afile = Uts.Std.Path.resolve(this._dataFolder + "/" + this._sessions[i]);
       await Deno.remove(afile);
       console.log("Deleted session file: " + afile)
       this._sessions.pop();

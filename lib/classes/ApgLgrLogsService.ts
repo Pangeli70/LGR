@@ -11,7 +11,7 @@
  * -----------------------------------------------------------------------
  */
 
-import {  Rst, Uts} from "../deps.ts"
+import { Rst, Uts } from "../deps.ts"
 
 
 import { IApgLgr } from "../interfaces/IApgLgr.ts";
@@ -20,7 +20,7 @@ import { IApgLgr } from "../interfaces/IApgLgr.ts";
 /**
  * Service to browse and purge logs Data
  */
-export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
+export abstract class ApgLgrLogsService extends Uts.ApgUtsBaseService {
 
   protected _sessions: string[] = [];
 
@@ -29,11 +29,15 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
     return this._sessions.length > 0;
   }
 
-  get ImmutableSessions() { 
+  get ImmutableSessions() {
     return Uts.ApgUtsObj.DeepFreeze(this._sessions);
   }
 
-  abstract loadSessions(): Promise<Rst.IApgRst>;
+  loadSessions(): Promise<Rst.IApgRst> {
+    return new Promise<Rst.IApgRst>(() => {
+      throw new Error(`If you want to call method [${this.loadSessions.name}] you must override the implementation.`)
+    })
+  }
 
 
   protected sortSessionsDescending() {
@@ -52,11 +56,19 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
   }
 
 
-  abstract loadLoggersFromSessionIndex(asessionIndex: number): Promise<IApgLgr[]>;
+  loadLoggersFromSessionIndex(_asessionIndex: number): Promise<IApgLgr[]> { 
+    return new Promise<IApgLgr[]>(() => {
+      throw new Error(`If you want to call method [${this.loadLoggersFromSessionIndex.name}] you must override the implementation.`)
+    })
+  }
 
-  abstract purgeOldSessions(akeepTheLast: number): Promise<Rst.IApgRst>;
+  purgeOldSessions(_akeepTheLast: number): Promise<Rst.IApgRst> { 
+    return new Promise<Rst.IApgRst>(() => {
+      throw new Error(`If you want to call method [${this.purgeOldSessions.name}] you must override the implementation.`)
+    })
+  }
 
-  
+
   async getLoggerWithFilteredEvents(
     asessionIndex: number,
     aloggerId: number,
@@ -76,7 +88,7 @@ export abstract class ApgLgrLogsService extends Uts.ApgUtsMeta {
 
     if (aerrorsOnly) {
 
-      r.events = r.events.filter(aevent => (aevent.result! && !aevent.result.ok) )
+      r.events = r.events.filter(aevent => (aevent.result! && !aevent.result.ok))
 
     }
     return r;

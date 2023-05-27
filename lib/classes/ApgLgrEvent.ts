@@ -27,6 +27,7 @@ export class ApgLgrEvent implements IApgLgrEvent {
   dateTimeStamp: string;
   hrt: number;
   result?: Rst.IApgRst;
+  memory?: Deno.MemoryUsage
 
 
   constructor(
@@ -39,7 +40,7 @@ export class ApgLgrEvent implements IApgLgrEvent {
     this.className = aclass;
     this.method = amethod;
     
-    this.dateTimeStamp = new Uts.ApgUtsDateTimeStamp(new Date()).Value;
+    this.dateTimeStamp = new Uts.ApgUtsDateTimeStamp(new Date()).Stamp;
     this.hrt = performance.now();
     if (aresult) {
       this.result = aresult;

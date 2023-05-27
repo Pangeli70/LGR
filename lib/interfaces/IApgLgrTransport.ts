@@ -7,7 +7,7 @@
  * -----------------------------------------------------------------------
  */
 
-import { MongoCollection } from '../deps.ts';
+import { Mongo } from '../deps.ts';
 import { eApgLgrTransportTypes } from '../enums/eApgLgrTransportTypes.ts';
 import { IApgLgr } from "./IApgLgr.ts";
 
@@ -17,5 +17,5 @@ export interface IApgLgrTransport {
 
   file?: string;
 
-  collection?: MongoCollection<IApgLgr>;
+  collection?: Mongo.Collection<IApgLgr>;
 }

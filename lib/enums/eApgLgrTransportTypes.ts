@@ -10,5 +10,6 @@ export enum eApgLgrTransportTypes {
   file = 'file',
   mongoLocal = 'mongoLocal',
   mongoAtlas = 'mongoAtlas',
+  mongoAtlasApi = 'mongoAtlasApi'
 
 }

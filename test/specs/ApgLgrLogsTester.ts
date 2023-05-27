@@ -2,6 +2,7 @@
  * @module [Lgr]
  * @author [APG] ANGELI Paolo Giusto
  * @version 0.9.2 [APG 2022/09/24] Github Beta
+ * @version 0.9.7 [APG 2023/05/27] Separation of concerns lib/src
  * -----------------------------------------------------------------------
  */
 import { Mng } from "../deps.ts";
@@ -34,7 +35,7 @@ export class ApgLgrLogsTester extends Lgr.ApgLgrLoggable {
             if (!logsCollections) {
                 return null;
             }
-            r = new Lgr.ApgLgrLogsDbService(logsCollections)
+            r = new Lgr.ApgLgrLogsMongoDbService(logsCollections)
         }
         return r;
     }

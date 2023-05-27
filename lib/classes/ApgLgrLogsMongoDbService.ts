@@ -11,7 +11,7 @@
  * -----------------------------------------------------------------------
  */
 
-import { MongoCollection, Rst } from "../deps.ts"
+import { Mongo, Rst } from "../deps.ts"
 import { IApgLgr } from "../interfaces/IApgLgr.ts";
 import { ApgLgrLogsService } from "./ApgLgrLogsService.ts";
 
@@ -19,11 +19,11 @@ import { ApgLgrLogsService } from "./ApgLgrLogsService.ts";
 /**
  * Service to browse and purge logs Data from Mongo Database
  */
-export class ApgLgrLogsDbService extends ApgLgrLogsService {
+export class ApgLgrLogsMongoDbService extends ApgLgrLogsService {
 
-  private _collection?: MongoCollection<IApgLgr>;
+  private _collection?: Mongo.Collection<IApgLgr>;
 
-  constructor(acollection: MongoCollection<IApgLgr>) {
+  constructor(acollection: Mongo.Collection<IApgLgr>) {
 
     super(import.meta.url);
 
@@ -37,7 +37,7 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
   }
 
 
-  async loadSessions() {
+  override async loadSessions() {
 
     this._sessions = await this.#readLogSessionsFromDb();
 
@@ -71,7 +71,7 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
   }
 
 
-  async loadLoggersFromSessionIndex(asessionIndex: number): Promise<IApgLgr[]> {
+  override async loadLoggersFromSessionIndex(asessionIndex: number): Promise<IApgLgr[]> {
 
     if (!this.IsReady) {
       await this.loadSessions();
@@ -105,7 +105,7 @@ export class ApgLgrLogsDbService extends ApgLgrLogsService {
   }
 
 
-  async purgeOldSessions(akeepTheLast: number) {
+  override async purgeOldSessions(akeepTheLast: number) {
 
     const r = { ok: true } as Rst.IApgRst;
     const n = await this.#purgeSessionsDocumentsFromDb(akeepTheLast);

@@ -28,4 +28,7 @@ export interface IApgLgrEvent {
 
   /** Internal error code of the event */
   result?: Rst.IApgRst;
+
+  /** Memory usage */
+  memory?: Deno.MemoryUsage
 }

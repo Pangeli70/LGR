@@ -22,7 +22,7 @@ import { ApgLgr } from './ApgLgr.ts';
 /** 
  * Base class for inheritance or composition of objects that can log events
  */
-export class ApgLgrLoggable extends Uts.ApgUtsMeta {
+export class ApgLgrLoggable extends Uts.ApgUtsBaseService {
 
   /** Class name */
   readonly className: string;
@@ -102,7 +102,7 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
     const BEGIN = "{"
 
     this._callsStack.push(amethodName);
-    this.logger.depth++;
+    this.logger.increaseDepth();
 
     if (aresult) {
       const message = aresult.message ? BEGIN + " => " + aresult.message : BEGIN
@@ -142,7 +142,7 @@ export class ApgLgrLoggable extends Uts.ApgUtsMeta {
       this.logTrace(END);
     }
 
-    this.logger.depth--;
+    this.logger.decreaseDepth();
     this._callsStack.pop();
 
   }

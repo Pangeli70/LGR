@@ -13,9 +13,7 @@
  * -----------------------------------------------------------------------
  */
 
-import {
-  MongoCollection, StdPath, Uts, Rst, Mng
-} from '../deps.ts';
+import { Mongo, Uts, Rst, Mng } from '../deps.ts';
 
 import { ApgLgrEvent } from './ApgLgrEvent.ts'
 import { IApgLgr } from '../interfaces/IApgLgr.ts'
@@ -40,31 +38,38 @@ export class ApgLgr {
   private static readonly _transports: Map<eApgLgrTransportTypes, IApgLgrTransport> = new Map();
 
   /** Current logger index in this logging session*/
-  id = 0;
+  readonly id: number;
 
   /** Current logging session reference */
-  session: string;
+  readonly session: string;
 
   /** Logger name to help identification*/
-  name: string;
+  readonly name: string;
 
   /** This creation date is used to sort data in Mongo DB storage */
-  creationTime: Date = new Date();
+  readonly creationTime: Date = new Date();
 
   /** High resolution timer creation */
-  creationHrt = performance.now();
+  readonly creationHrt = performance.now();
 
-  /** Events traced between cration and flush */
-  events: ApgLgrEvent[] = [];
+  /** Events traced between creation and flush */
+  readonly events: ApgLgrEvent[] = [];
 
-  /** Leve indicator of nested log calls */
-  depth = 0;
+  /** Level counter of nested log calls */
+  private _depth = 0;
+  get depth() { return this._depth }
+  increaseDepth() { this._depth++; }
+  decreaseDepth() { this._depth--; }
 
   /** At least one of the logged events is an error */
-  hasErrors = false;
+  private _hasErrors = false;
+  get hasErrors() { return this._hasErrors }
 
   /** Total time in milliseconds between creation and flush*/
-  totalHrt = 0;
+  private _totalHrt = 0;
+
+  /** Flag to collect also memory usage for this logger when collecting the events */
+  collectMemoryUsage = false;
 
   constructor(aname: string) {
     this.name = aname;
@@ -85,7 +90,7 @@ export class ApgLgr {
   ) {
 
     const r = new ApgLgrEvent(
-      this.depth,
+      this._depth,
       aclass,
       amethod,
       aresult
@@ -94,16 +99,20 @@ export class ApgLgr {
 
     if (aresult) {
       if (!aresult.ok) {
-        this.hasErrors = true;
+        this._hasErrors = true;
       }
       if (ApgLgr._transports.has(eApgLgrTransportTypes.console)) {
         console.log(`${this.name} => ${aclass}.${amethod}:`);
         const message = Rst.ApgRst.InterpolateMessage(aresult)
-        console.log(`    message: ${message}`);
+        console.log(`ApgLgr(${this.name}): ${message}`);
         if (aresult.payload) {
           console.dir(aresult.payload);
         }
       }
+    }
+
+    if (this.collectMemoryUsage) {
+      r.memory = Deno.memoryUsage();
     }
     return r;
   }
@@ -123,12 +132,12 @@ export class ApgLgr {
   }
 
   /**
-   * @param alogsDevPath Must exist and have file write permissions
+   * @param alogsDevPath Must exist and have file write permissions (So no deno deploy)
    * @param afile 
    * @remarks Exits Deno on write permission errors
    */
   static async AddFileTransport(alogsDevPath: string, afile: string) {
-    const path = StdPath.resolve(alogsDevPath);
+    const path = Uts.Std.Path.resolve(alogsDevPath);
 
     try {
       const status = await Deno.permissions.query({ name: "write", path: path });
@@ -146,18 +155,19 @@ export class ApgLgr {
 
     const fileTransport: IApgLgrTransport = {
       type: eApgLgrTransportTypes.file,
-      file: StdPath.join(path, "/", afile)
+      file: Uts.Std.Path.join(path, "/", afile)
     }
-    
+
     ApgLgr._transports.set(eApgLgrTransportTypes.file, fileTransport);
   }
 
-  static AddMongoTransport(acollection: MongoCollection<IApgLgr>, amode: Mng.eApgMngMode) {
+
+  static AddMongoTransport(acollection: Mongo.Collection<IApgLgr>, amode: Mng.eApgMngMode) {
 
     const transportType = (amode == Mng.eApgMngMode.local) ?
       eApgLgrTransportTypes.mongoLocal :
       eApgLgrTransportTypes.mongoAtlas;
-    
+
     const mongoTransport: IApgLgrTransport = {
       type: transportType,
       collection: acollection
@@ -174,7 +184,7 @@ export class ApgLgr {
   async flush() {
 
     const now = performance.now();
-    this.totalHrt = now - this.creationHrt;
+    this._totalHrt = now - this.creationHrt;
 
     const fileTransport = ApgLgr._transports.get(eApgLgrTransportTypes.file)
     if (fileTransport) {
@@ -194,8 +204,8 @@ export class ApgLgr {
     ApgLgr._flushCount++;
 
     Rst.ApgRstAssert.IsFalse(
-      this.depth === 0,
-      `The logger with ID=[${this.id}], named: [${this.name}] was flushed with depth of: [${this.depth}] instead of Zero. There are mismatches in begin-end profiling.`,
+      this._depth === 0,
+      `The logger with ID=[${this.id}], named: [${this.name}] was flushed with depth of: [${this._depth}] instead of Zero. There are mismatches in begin-end profiling.`,
       true
     )
 
@@ -225,7 +235,7 @@ export class ApgLgr {
 
   }
 
-  async #flushMongo(acollection: MongoCollection<IApgLgr>, aentry: IApgLgr) {
+  async #flushMongo(acollection: Mongo.Collection<IApgLgr>, aentry: IApgLgr) {
 
     await acollection.insertOne(aentry);
 
